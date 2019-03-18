@@ -31,6 +31,7 @@ class MineSweeper {
         }
         $el.classList.add("MineSweeper", "MineSweeper--init");
         // $el.setAttribute("@contextmenu", "event.preventDefault()");
+        $el.style.zoom = window.devicePixelRatio ? (1 / window.devicePixelRatio).toString() : "1";
         let html = `` +
         `<div class="MineSweeper__top">` +
             `<div class="MineSweeper__number">` +

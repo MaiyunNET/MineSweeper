@@ -9,6 +9,10 @@
 <meta http-equiv="Expires" content="0">
 <script src="../ms.js?0"></script>
 <link rel="stylesheet" href="../ms.css?0">
+<style>
+#box {display: flex; position: fixed; left: 0; top: 0; width: 100%; height: 100%; justify-content: center; align-items: center; flex-direction: column;}
+button {font-size: 16px; padding: 5px 15px;}
+</style>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     MineSweeper.create("#ms");
@@ -16,6 +20,14 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </head>
 <body>
-<div id="ms"></div>
+<div id="box">
+    <div id="ms"></div>
+    <div style="margin-top: 10px;">
+        <button onclick="document.querySelector('#ms').style.zoom = window.devicePixelRatio ? (1 / window.devicePixelRatio).toString() : '1';">1x</button>
+        <button onclick="document.querySelector('#ms').style.zoom = window.devicePixelRatio ? (1 / window.devicePixelRatio * 2).toString() : '2';" style="margin-left: 10px;">2x</button>
+        <button onclick="document.querySelector('#ms').style.zoom = window.devicePixelRatio ? (1 / window.devicePixelRatio * 3).toString() : '3';" style="margin-left: 10px;">3x</button>
+        <button onclick="document.querySelector('#ms').style.zoom = window.devicePixelRatio ? (1 / window.devicePixelRatio * 4).toString() : '4';" style="margin-left: 10px;">4x</button>
+    </div>
+</div>
 </body>
 </html>

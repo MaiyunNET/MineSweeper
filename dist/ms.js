@@ -55,6 +55,7 @@ var MineSweeper = (function () {
             $el = el;
         }
         $el.classList.add("MineSweeper", "MineSweeper--init");
+        $el.style.zoom = window.devicePixelRatio ? (1 / window.devicePixelRatio).toString() : "1";
         var html = "" +
             "<div class=\"MineSweeper__top\">" +
             "<div class=\"MineSweeper__number\">" +
