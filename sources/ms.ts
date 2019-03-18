@@ -30,6 +30,7 @@ class MineSweeper {
             $el = el;
         }
         $el.classList.add("MineSweeper", "MineSweeper--init");
+        // $el.setAttribute("@contextmenu", "event.preventDefault()");
         let html = `` +
         `<div class="MineSweeper__top">` +
             `<div class="MineSweeper__number">` +
@@ -214,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let i = 1; i <= 8; ++i) {
             imgList.push(i + ".png");
         }
-        for (let i = 0; i <= 3; ++i) {
+        for (let i = 0; i <= 4; ++i) {
             imgList.push("face" + i + ".png");
         }
         for (let i = 0; i <= 9; ++i) {

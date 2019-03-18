@@ -248,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     for (i = 1; i <= 8; ++i) {
                         imgList.push(i + ".png");
                     }
-                    for (i = 0; i <= 3; ++i) {
+                    for (i = 0; i <= 4; ++i) {
                         imgList.push("face" + i + ".png");
                     }
                     for (i = 0; i <= 9; ++i) {
