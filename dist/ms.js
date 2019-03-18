@@ -54,6 +54,10 @@ var MineSweeper = (function () {
         else {
             $el = el;
         }
+        var mobile = navigator.userAgent.indexOf("Mobile") !== -1;
+        var mousedown = mobile ? "touchstart" : "mousedown";
+        var mouseup = mobile ? "touchend" : "mouseup";
+        var mouseleave = mobile ? "touchmove" : "mouseleave";
         $el.classList.add("MineSweeper", "MineSweeper--init");
         var html = "" +
             "<div class=\"MineSweeper__top\">" +
@@ -75,7 +79,7 @@ var MineSweeper = (function () {
             "<div class=\"MineSweeper__num\" :class=\"['MineSweeper__num'+time[2]]\"></div>" +
             "</div>" +
             "</div>" +
-            "<div class=\"MineSweeper__box\" @mousedown=\"mousedown = true\" @mouseup=\"mousedown = false\" @mouseleave=\"mousedown = false\">" +
+            ("<div class=\"MineSweeper__box\" @" + mousedown + "=\"mousedown = true\" @" + mouseup + "=\"mousedown = false\" @" + mouseleave + "=\"mousedown = false\">") +
             "<div v-for=\"(line, y) of blocks\" class=\"MineSweeper__line\">" +
             "<div v-for=\"(num, x) of line\" class=\"MineSweeper__block\" :class=\"[" +
             "num > 0 ? 'MineSweeper__block--' + num : ''," +
@@ -89,7 +93,7 @@ var MineSweeper = (function () {
             "'MineSweeper__block--minex': num === -4," +
             "'MineSweeper__block--qm': num === -3," +
             "}" +
-            "]\" @click=\"sweep(x, y)\" @contextmenu=\"rightclick(x, y)\" @mousedown=\"md(x, y, event)\"></div>" +
+            ("]\" @click=\"sweep(x, y)\" @contextmenu=\"rightclick(x, y)\" @" + mousedown + "=\"md(x, y, event)\"></div>") +
             "</div>" +
             "</div>" +
             "<div class=\"MineSweeper__mask\">" +
@@ -211,13 +215,16 @@ var MineSweeper = (function () {
                         ms.__vue.dxy[(x + 1) + "," + (y - 1)] = true;
                         ms.__vue.dxy[x + "," + (y - 1)] = true;
                         var $o_1 = event.target;
+                        var mobile = navigator.userAgent.indexOf("Mobile") !== -1;
+                        var mouseup_1 = mobile ? "touchend" : "mouseup";
+                        var mouseleave_1 = mobile ? "touchmove" : "mouseleave";
                         var fun_1 = function () {
                             ms.__vue.dxy = {};
-                            $o_1.removeEventListener("mouseup", fun_1);
-                            $o_1.removeEventListener("mouseleave", fun_1);
+                            $o_1.removeEventListener(mouseup_1, fun_1);
+                            $o_1.removeEventListener(mouseleave_1, fun_1);
                         };
-                        $o_1.addEventListener("mouseup", fun_1);
-                        $o_1.addEventListener("mouseleave", fun_1);
+                        $o_1.addEventListener(mouseup_1, fun_1);
+                        $o_1.addEventListener(mouseleave_1, fun_1);
                     }
                 },
                 restart: function () {

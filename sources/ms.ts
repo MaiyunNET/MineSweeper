@@ -29,6 +29,11 @@ class MineSweeper {
         } else {
             $el = el;
         }
+        // --- 判断是否手机 ---
+        let mobile = navigator.userAgent.indexOf("Mobile") !== -1;
+        let mousedown = mobile ? "touchstart" : "mousedown";
+        let mouseup = mobile ? "touchend" : "mouseup";
+        let mouseleave = mobile ? "touchmove" : "mouseleave";
         $el.classList.add("MineSweeper", "MineSweeper--init");
         let html = `` +
         `<div class="MineSweeper__top">` +
@@ -50,7 +55,7 @@ class MineSweeper {
                 `<div class="MineSweeper__num" :class="['MineSweeper__num'+time[2]]"></div>` +
             `</div>` +
         `</div>` +
-        `<div class="MineSweeper__box" @mousedown="mousedown = true" @mouseup="mousedown = false" @mouseleave="mousedown = false">` +
+        `<div class="MineSweeper__box" @${mousedown}="mousedown = true" @${mouseup}="mousedown = false" @${mouseleave}="mousedown = false">` +
             `<div v-for="(line, y) of blocks" class="MineSweeper__line">` +
                 `<div v-for="(num, x) of line" class="MineSweeper__block" :class="[` +
                     `num > 0 ? 'MineSweeper__block--' + num : '',` +
@@ -64,7 +69,7 @@ class MineSweeper {
                         `'MineSweeper__block--minex': num === -4,` +
                         `'MineSweeper__block--qm': num === -3,` +
                     `}` +
-                `]" @click="sweep(x, y)" @contextmenu="rightclick(x, y)" @mousedown="md(x, y, event)"></div>` +
+                `]" @click="sweep(x, y)" @contextmenu="rightclick(x, y)" @${mousedown}="md(x, y, event)"></div>` +
             `</div>` +
         `</div>` +
         `<div class="MineSweeper__mask">` +
@@ -186,13 +191,16 @@ class MineSweeper {
                         ms.__vue.dxy[(x + 1) + "," + (y - 1)] = true;
                         ms.__vue.dxy[x + "," + (y - 1)] = true;
                         let $o = <HTMLElement>event.target;
+                        let mobile = navigator.userAgent.indexOf("Mobile") !== -1;
+                        let mouseup = mobile ? "touchend" : "mouseup";
+                        let mouseleave = mobile ? "touchmove" : "mouseleave";
                         let fun = () => {
                             ms.__vue.dxy = {};
-                            $o.removeEventListener("mouseup", fun);
-                            $o.removeEventListener("mouseleave", fun);
+                            $o.removeEventListener(mouseup, fun);
+                            $o.removeEventListener(mouseleave, fun);
                         };
-                        $o.addEventListener("mouseup", fun);
-                        $o.addEventListener("mouseleave", fun);
+                        $o.addEventListener(mouseup, fun);
+                        $o.addEventListener(mouseleave, fun);
                     }
                 },
                 // --- 笑脸按钮 ---
