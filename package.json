@@ -1,0 +1,13 @@
+{
+  "name": "mine-sweeper",
+  "version": "0.0.1",
+  "description": "Casual game: MineSweeper.",
+  "keywords": [
+    "mine", "game", "console"
+  ],
+  "main": "dist/ms.js",
+  "author": "hanguoshuai",
+  "license": "Apache-2.0",
+  "types": "./dist/ms.d.ts",
+  "typings": "./dist/ms.d.ts"
+}
