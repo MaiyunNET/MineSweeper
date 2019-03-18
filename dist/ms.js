@@ -75,11 +75,14 @@ var MineSweeper = (function () {
             "<div v-for=\"(line, y) of blocks\" class=\"MineSweeper__line\">" +
             "<div v-for=\"(num, x) of line\" class=\"MineSweeper__block\" :class=\"[" +
             "num > 0 ? 'MineSweeper__block--' + num : ''," +
+            "num === -6 ? 'MineSweeper__block--red' : ''," +
+            "num === -2 ? 'MineSweeper__block--flag' : ''," +
+            "num === -3 ? 'MineSweeper__block--qm' : ''," +
             "{" +
             "'MineSweeper__block--t': [-1, -2, -3].indexOf(num) !== -1," +
             "'MineSweeper__block--flag': num === -2," +
-            "'MineSweeper__block--mine': num === -5," +
-            "'MineSweeper__block--minex': num === -4," +
+            "'MineSweeper__block--mine': [-5, -6].indexOf(num) !== -1," +
+            "'MineSweeper__block--minex': num === -3," +
             "'MineSweeper__block--qm': num === -3," +
             "}" +
             "]\" @click=\"sweep(x, y)\"></div>" +

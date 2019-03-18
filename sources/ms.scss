@@ -6,6 +6,10 @@
 
 /* --- sass --watch sources:dist --style compressed --- */
 
+* {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
 .MineSweeper {
     background-color: #c0c0c0;
     padding: 6px;
@@ -87,6 +91,9 @@
 }
 .MineSweeper__block--qm {
     background-image: url(img/qm.png);
+}
+.MineSweeper__block--red {
+    background-color: #ff0000;
 }
 .MineSweeper__block--1 {
     background-image: url(img/1.png);
