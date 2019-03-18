@@ -55,7 +55,6 @@ var MineSweeper = (function () {
             $el = el;
         }
         $el.classList.add("MineSweeper", "MineSweeper--init");
-        $el.style.zoom = window.devicePixelRatio ? (1 / window.devicePixelRatio).toString() : "1";
         var html = "" +
             "<div class=\"MineSweeper__top\">" +
             "<div class=\"MineSweeper__number\">" +
@@ -64,7 +63,11 @@ var MineSweeper = (function () {
             "<div class=\"MineSweeper__num\" :class=\"['MineSweeper__num'+mine[2]]\"></div>" +
             "</div>" +
             "<div class=\"MineSweeper__tcenter\">" +
-            "<div class=\"MineSweeper__tbtn\"></div>" +
+            "<div class=\"MineSweeper__tbtn\" :class=\"{" +
+            "'MineSweeper__face2': !mousedown && state === 1," +
+            "'MineSweeper__face3': !mousedown && state === 2," +
+            "'MineSweeper__face4': mousedown" +
+            "}\" @click=\"restart()\"></div>" +
             "</div>" +
             "<div class=\"MineSweeper__number\">" +
             "<div class=\"MineSweeper__num\" :class=\"['MineSweeper__num'+time[0]]\"></div>" +
@@ -72,7 +75,7 @@ var MineSweeper = (function () {
             "<div class=\"MineSweeper__num\" :class=\"['MineSweeper__num'+time[2]]\"></div>" +
             "</div>" +
             "</div>" +
-            "<div class=\"MineSweeper__box\">" +
+            "<div class=\"MineSweeper__box\" @mousedown=\"mousedown = true\" @mouseup=\"mousedown = false\" @mouseleave=\"mousedown = false\">" +
             "<div v-for=\"(line, y) of blocks\" class=\"MineSweeper__line\">" +
             "<div v-for=\"(num, x) of line\" class=\"MineSweeper__block\" :class=\"[" +
             "num > 0 ? 'MineSweeper__block--' + num : ''," +
@@ -80,13 +83,13 @@ var MineSweeper = (function () {
             "num === -2 ? 'MineSweeper__block--flag' : ''," +
             "num === -3 ? 'MineSweeper__block--qm' : ''," +
             "{" +
-            "'MineSweeper__block--t': [-1, -2, -3].indexOf(num) !== -1," +
+            "'MineSweeper__block--t': [-2, -3].indexOf(num) !== -1 || (num === -1 && !dxy[x + ',' + y])," +
             "'MineSweeper__block--flag': num === -2," +
             "'MineSweeper__block--mine': [-5, -6].indexOf(num) !== -1," +
-            "'MineSweeper__block--minex': num === -3," +
+            "'MineSweeper__block--minex': num === -4," +
             "'MineSweeper__block--qm': num === -3," +
             "}" +
-            "]\" @click=\"sweep(x, y)\"></div>" +
+            "]\" @click=\"sweep(x, y)\" @contextmenu=\"rightclick(x, y)\" @mousedown=\"md(x, y, event)\"></div>" +
             "</div>" +
             "</div>" +
             "<div class=\"MineSweeper__mask\">" +
@@ -107,11 +110,15 @@ var MineSweeper = (function () {
         ms.__vue = new Vue({
             el: el,
             data: {
+                mousedown: false,
                 mineNum: 10,
                 timeNum: 0,
+                state: 0,
                 blocks: [
                     [],
-                ]
+                ],
+                timer: undefined,
+                dxy: {}
             },
             computed: {
                 mine: function () {
@@ -123,21 +130,106 @@ var MineSweeper = (function () {
             },
             methods: {
                 pad: function (num) {
-                    var l = 3 - num.toString().length;
-                    if (l > 0) {
-                        var str = "";
-                        for (var k = 0; k < l; ++k) {
-                            str += "0";
+                    var numStr = num.toString();
+                    if (numStr[0] !== "-") {
+                        var l = 3 - numStr.length;
+                        if (l > 0) {
+                            var str = "";
+                            for (var k = 0; k < l; ++k) {
+                                str += "0";
+                            }
+                            return str + numStr;
                         }
-                        return str + num.toString();
+                        else {
+                            return numStr;
+                        }
                     }
                     else {
-                        return num.toString();
+                        numStr = numStr.substr(1);
+                        var l = 2 - numStr.length;
+                        if (l > 0) {
+                            var str = "";
+                            for (var k = 0; k < l; ++k) {
+                                str += "0";
+                            }
+                            return "-" + str + numStr;
+                        }
+                        else {
+                            return "-" + numStr;
+                        }
                     }
                 },
                 sweep: function (x, y) {
-                    ms.__mis.sweep(x, y);
+                    var state;
+                    if (ms.__vue.blocks[y][x] < 0) {
+                        if (ms.__vue.timer === undefined) {
+                            ms.__vue.timeNum = 1;
+                            ms.__vue.timer = setInterval(function () {
+                                if (ms.__vue.timeNum < 999) {
+                                    ++ms.__vue.timeNum;
+                                }
+                            }, 1000);
+                        }
+                        state = ms.__mis.sweep(x, y);
+                    }
+                    else {
+                        state = ms.__mis.explore(x, y);
+                    }
                     ms.__vue.blocks = ms.__mis.getMap();
+                    ms.__vue.state = ms.__mis.getStatus();
+                    if (state !== 0) {
+                        clearInterval(ms.__vue.timer);
+                        ms.__vue.timer = undefined;
+                    }
+                },
+                rightclick: function (x, y) {
+                    if ([-1, -2, -3].indexOf(this.blocks[y][x]) !== -1) {
+                        var mark = void 0;
+                        switch (this.blocks[y][x]) {
+                            case -1:
+                                mark = 1;
+                                break;
+                            case -2:
+                                mark = 2;
+                                break;
+                            default:
+                                mark = 0;
+                        }
+                        ms.__mis.mark(x, y, mark);
+                        ms.__vue.blocks = ms.__mis.getMap();
+                        ms.__vue.mineNum = ms.__mis.getRestMineQuantity();
+                    }
+                },
+                md: function (x, y, event) {
+                    if (ms.__vue.blocks[y][x] >= 0) {
+                        ms.__vue.dxy[(x - 1) + "," + (y - 1)] = true;
+                        ms.__vue.dxy[(x - 1) + "," + y] = true;
+                        ms.__vue.dxy[(x - 1) + "," + (y + 1)] = true;
+                        ms.__vue.dxy[x + "," + (y + 1)] = true;
+                        ms.__vue.dxy[(x + 1) + "," + (y + 1)] = true;
+                        ms.__vue.dxy[(x + 1) + "," + y] = true;
+                        ms.__vue.dxy[(x + 1) + "," + (y - 1)] = true;
+                        ms.__vue.dxy[x + "," + (y - 1)] = true;
+                        var $o_1 = event.target;
+                        var fun_1 = function () {
+                            ms.__vue.dxy = {};
+                            $o_1.removeEventListener("mouseup", fun_1);
+                            $o_1.removeEventListener("mouseleave", fun_1);
+                        };
+                        $o_1.addEventListener("mouseup", fun_1);
+                        $o_1.addEventListener("mouseleave", fun_1);
+                    }
+                },
+                restart: function () {
+                    ms.__mis.restart();
+                    ms.__vue.blocks = ms.__mis.getMap();
+                    ms.__vue.state = ms.__mis.getStatus();
+                    ms.__vue.mineNum = ms.__mis.getRestMineQuantity();
+                    ms.__vue.timeNum = 0;
+                    if (ms.__vue.timer !== undefined) {
+                        clearInterval(ms.__vue.timer);
+                        ms.__vue.timer = undefined;
+                    }
                 }
             },
             mounted: function () {
@@ -145,6 +237,9 @@ var MineSweeper = (function () {
                     var $el = ms.__vue.$el;
                     $el.classList.remove("MineSweeper--init");
                     $el.removeChild($el.querySelector(".MineSweeper__mask"));
+                    $el.addEventListener("contextmenu", function (e) {
+                        e.preventDefault();
+                    });
                 });
             }
         });
@@ -217,7 +312,6 @@ var MineSweeper = (function () {
                     $img.addEventListener("load", function () {
                         --pl;
                         if (pl === 0) {
-                            document.body.removeChild($div);
                             resolve();
                         }
                     });
@@ -244,7 +338,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 case 1:
                     _c.sent();
                     imgList = [
-                        "flag.png", "mine.png", "minex.png", "qm.png"
+                        "flag.png", "mine.png", "minex.png", "qm.png", "t-.png"
                     ];
                     for (i = 1; i <= 8; ++i) {
                         imgList.push(i + ".png");
