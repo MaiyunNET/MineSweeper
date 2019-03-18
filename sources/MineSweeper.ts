@@ -228,6 +228,19 @@ class MineSweeper implements A.IMineSweeper {
         ) {
 
             this._context.status = A.EGameStatus.WIN;
+            this._context.restMines = 0;
+            this._context.unknowns = 0;
+
+            for (let x = 0; x < this._width; x++) {
+
+                for (let y = 0; y < this._height; y++) {
+
+                    if (this._context.mines[y][x] === -1) {
+
+                        this._context.blocks[y][x] = A.EBlockType.MARKED;
+                    }
+                }
+            }
         }
     }
 

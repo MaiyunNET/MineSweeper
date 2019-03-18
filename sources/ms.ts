@@ -160,6 +160,7 @@ class MineSweeper {
                     }
                     ms.__vue.blocks = ms.__mis.getMap();
                     ms.__vue.state = ms.__mis.getStatus();
+                    ms.__vue.mineNum = ms.__mis.getRestMineQuantity();
                     if (state !== 0) {
                         clearInterval(ms.__vue.timer);
                         ms.__vue.timer = undefined;

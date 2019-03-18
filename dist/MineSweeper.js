@@ -134,6 +134,15 @@ define(["require", "exports", "./abstract"], function (require, exports, A) {
         MineSweeper.prototype._checkWin = function () {
             if (this._context.unknowns === this._context.restMines) {
                 this._context.status = A.EGameStatus.WIN;
+                this._context.restMines = 0;
+                this._context.unknowns = 0;
+                for (var x = 0; x < this._width; x++) {
+                    for (var y = 0; y < this._height; y++) {
+                        if (this._context.mines[y][x] === -1) {
+                            this._context.blocks[y][x] = A.EBlockType.MARKED;
+                        }
+                    }
+                }
             }
         };
         MineSweeper.prototype._findBlocksAround = function (x, y) {
