@@ -110,7 +110,12 @@ var MineSweeper = (function () {
         return ms;
     };
     MineSweeper.__create = function (el, opt, ms) {
-        ms.__mis = MineSweeper.__ms.createMineSweeper(9, 9, 10);
+        ms.__mis = MineSweeper.__ms.createMineSweeper({
+            height: 9,
+            width: 9,
+            minesQuantity: 10,
+            showMinesOnlyOnFailed: true
+        });
         ms.__vue = new Vue({
             el: el,
             data: {
@@ -166,7 +171,7 @@ var MineSweeper = (function () {
                 sweep: function (x, y) {
                     var state;
                     if (ms.__vue.blocks[y][x] < 0) {
-                        if (ms.__vue.timer === undefined) {
+                        if (ms.__vue.timer === undefined && ms.__vue.state === 0) {
                             ms.__vue.timeNum = 1;
                             ms.__vue.timer = setInterval(function () {
                                 if (ms.__vue.timeNum < 999) {
@@ -206,6 +211,9 @@ var MineSweeper = (function () {
                 },
                 md: function (x, y, event) {
                     if (ms.__vue.blocks[y][x] >= 0) {
+                        if (event.button !== undefined && event.button !== 0) {
+                            return;
+                        }
                         ms.__vue.dxy[(x - 1) + "," + (y - 1)] = true;
                         ms.__vue.dxy[(x - 1) + "," + y] = true;
                         ms.__vue.dxy[(x - 1) + "," + (y + 1)] = true;

@@ -3,10 +3,12 @@ define(["require", "exports", "./abstract"], function (require, exports, A) {
     Object.defineProperty(exports, "__esModule", { value: true });
     var MINE_FLAG = -1;
     var MineSweeper = (function () {
-        function MineSweeper(_width, _height, _mineQuantity) {
-            this._width = _width;
+        function MineSweeper(_height, _width, _mineQuantity, _showMinesOnlyOnFailed) {
+            if (_showMinesOnlyOnFailed === void 0) { _showMinesOnlyOnFailed = false; }
             this._height = _height;
+            this._width = _width;
             this._mineQuantity = _mineQuantity;
+            this._showMinesOnlyOnFailed = _showMinesOnlyOnFailed;
             if (!Number.isInteger(this._width) ||
                 !Number.isInteger(this._height) ||
                 !Number.isInteger(this._mineQuantity) ||
@@ -66,6 +68,7 @@ define(["require", "exports", "./abstract"], function (require, exports, A) {
                             break;
                         }
                     }
+                    this._checkWin();
                     return true;
                 }
                 case A.EBlockType.QUESTION: {
@@ -84,6 +87,7 @@ define(["require", "exports", "./abstract"], function (require, exports, A) {
                             break;
                         }
                     }
+                    this._checkWin();
                     return true;
                 }
                 case A.EBlockType.UNKNWON: {
@@ -102,6 +106,7 @@ define(["require", "exports", "./abstract"], function (require, exports, A) {
                             break;
                         }
                     }
+                    this._checkWin();
                     return true;
                 }
                 default: {
@@ -113,20 +118,23 @@ define(["require", "exports", "./abstract"], function (require, exports, A) {
             var blk = this.getBlock(x, y);
             if (this._context.status !== A.EGameStatus.PLAYING ||
                 blk !== A.EBlockType.UNKNWON) {
-                return blk;
+                return this._context.status;
             }
             if (this._context.mines[y][x] === MINE_FLAG) {
                 this._die(x, y);
             }
             else {
-                this._cleanBlock(x, y);
                 this._context.blocks[y][x] = this._context.mines[y][x];
-                if (this._context.unknowns === 0 &&
-                    this._context.restMines === 0) {
-                    this._context.startedAt = A.EGameStatus.WIN;
-                }
+                this._cleanBlock(x, y);
+                this._context.unknowns--;
+                this._checkWin();
             }
             return this._context.status;
+        };
+        MineSweeper.prototype._checkWin = function () {
+            if (this._context.unknowns === this._context.restMines) {
+                this._context.status = A.EGameStatus.WIN;
+            }
         };
         MineSweeper.prototype._findBlocksAround = function (x, y) {
             var blocks = [];
@@ -182,7 +190,7 @@ define(["require", "exports", "./abstract"], function (require, exports, A) {
                             if (ctx.mines[y][x] === MINE_FLAG) {
                                 ctx.blocks[y][x] = A.EBlockType.MINE;
                             }
-                            else {
+                            else if (!this._showMinesOnlyOnFailed) {
                                 ctx.blocks[y][x] = ctx.mines[y][x];
                             }
                             break;
@@ -263,8 +271,8 @@ define(["require", "exports", "./abstract"], function (require, exports, A) {
         };
         return MineSweeper;
     }());
-    function createMineSweeper(width, height, mineQuantity) {
-        return new MineSweeper(width, height, mineQuantity);
+    function createMineSweeper(options) {
+        return new MineSweeper(options.height, options.width, options.minesQuantity, options.showMinesOnlyOnFailed);
     }
     exports.createMineSweeper = createMineSweeper;
 });

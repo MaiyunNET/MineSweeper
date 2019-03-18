@@ -29,9 +29,10 @@ class MineSweeper implements A.IMineSweeper {
     private _context!: IContext;
 
     public constructor(
-        private _width: number,
         private _height: number,
+        private _width: number,
         private _mineQuantity: number,
+        private _showMinesOnlyOnFailed: boolean = false
     ) {
 
         if (
@@ -127,6 +128,8 @@ class MineSweeper implements A.IMineSweeper {
                     }
                 }
 
+                this._checkWin();
+
                 return true;
             }
             case A.EBlockType.QUESTION: {
@@ -150,6 +153,8 @@ class MineSweeper implements A.IMineSweeper {
                         break;
                     }
                 }
+
+                this._checkWin();
 
                 return true;
             }
@@ -175,6 +180,8 @@ class MineSweeper implements A.IMineSweeper {
                     }
                 }
 
+                this._checkWin();
+
                 return true;
             }
 
@@ -194,7 +201,7 @@ class MineSweeper implements A.IMineSweeper {
             blk !== A.EBlockType.UNKNWON
         ) {
 
-            return blk;
+            return this._context.status;
         }
 
         if (this._context.mines[y][x] === MINE_FLAG) {
@@ -203,20 +210,25 @@ class MineSweeper implements A.IMineSweeper {
         }
         else {
 
-            this._cleanBlock(x, y);
-
             this._context.blocks[y][x] = this._context.mines[y][x];
 
-            if (
-                this._context.unknowns === 0 &&
-                this._context.restMines === 0
-            ) {
+            this._cleanBlock(x, y);
+            this._context.unknowns--;
 
-                this._context.startedAt = A.EGameStatus.WIN;
-            }
+            this._checkWin();
         }
 
         return this._context.status;
+    }
+
+    private _checkWin(): void {
+
+        if (
+            this._context.unknowns === this._context.restMines
+        ) {
+
+            this._context.status = A.EGameStatus.WIN;
+        }
     }
 
     private _findBlocksAround(x: number, y: number): IBlock[] {
@@ -313,7 +325,7 @@ class MineSweeper implements A.IMineSweeper {
 
                             ctx.blocks[y][x] = A.EBlockType.MINE;
                         }
-                        else {
+                        else if (!this._showMinesOnlyOnFailed) {
 
                             ctx.blocks[y][x] = ctx.mines[y][x];
                         }
@@ -438,10 +450,13 @@ class MineSweeper implements A.IMineSweeper {
 }
 
 export function createMineSweeper(
-    width: number,
-    height: number,
-    mineQuantity: number
+    options: A.IGameOptions
 ): A.IMineSweeper {
 
-    return new MineSweeper(width, height, mineQuantity);
+    return new MineSweeper(
+        options.height,
+        options.width,
+        options.minesQuantity,
+        options.showMinesOnlyOnFailed
+    );
 }

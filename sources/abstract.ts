@@ -76,6 +76,31 @@ export enum EMarkStyle {
     QUESTION
 }
 
+export interface IGameOptions {
+
+    /**
+     * 游戏的地图高度。
+     */
+    height: number;
+
+    /**
+     * 游戏的地图宽度。
+     */
+    width: number;
+
+    /**
+     * 游戏的雷数。
+     */
+    minesQuantity: number;
+
+    /**
+     * 设置为 true 则游戏失败时只显示隐藏的雷，而不把所有的块展开。
+     *
+     * @default false
+     */
+    showMinesOnlyOnFailed?: boolean;
+}
+
 export interface IMineSweeper {
 
     /**

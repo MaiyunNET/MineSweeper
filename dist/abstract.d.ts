@@ -16,6 +16,12 @@ export declare enum EMarkStyle {
     MINE = 1,
     QUESTION = 2
 }
+export interface IGameOptions {
+    height: number;
+    width: number;
+    minesQuantity: number;
+    showMinesOnlyOnFailed?: boolean;
+}
 export interface IMineSweeper {
     restart(): void;
     getWidth(): number;
