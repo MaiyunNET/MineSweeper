@@ -44,9 +44,9 @@ class MineSweeper {
             `</div>` +
             `<div class="MineSweeper__tcenter">` +
                 `<div class="MineSweeper__tbtn" :class="{` +
-                    `'MineSweeper__face2': !mousedown && state === 1,` +
-                    `'MineSweeper__face3': !mousedown && state === 2,` +
-                    `'MineSweeper__face4': mousedown` +
+                    `'MineSweeper__face2': state === 1,` +
+                    `'MineSweeper__face3': state === 2,` +
+                    `'MineSweeper__face4': state === 0 && mousedown` +
                 `}" @click="restart()"></div>` +
             `</div>` +
             `<div class="MineSweeper__number">` +
